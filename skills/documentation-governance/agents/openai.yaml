@@ -1,0 +1,4 @@
+interface:
+  display_name: "文档治理"
+  short_description: "评估文档体系结构、事实源清晰度和交付就绪度"
+  default_prompt: "使用 $documentation-governance 检查当前项目文档体系的治理就绪度：模式、阶段、必须文档缺口、事实源冲突、断链、需人工决策点和交付状态。"

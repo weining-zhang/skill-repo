@@ -1,0 +1,116 @@
+# 完整治理报告模板
+
+只有当用户明确要求“完整治理报告”“完整报告”或“表格化报告”时，才使用本模板。
+
+## 一、项目模式与阶段判断
+
+- 模式：
+- 阶段：
+- 判断依据：
+
+## 二、文档 Inventory
+
+列出当前文档和目录。
+
+| 路径 | 类型 | 角色 | 是否事实源 | 备注 |
+| ---- | ---- | ---- | ---------- | ---- |
+
+角色只能使用以下枚举，可在备注中补充中文说明：
+
+- Primary Source（主事实源）
+- Derived（派生文档）
+- Index（索引 / 聚合入口）
+- Unknown（无法判断）
+
+## 三、必须文档覆盖性评估
+
+| 文档类型 | 是否必须 | 是否存在 | 结论 | 影响 |
+| -------- | -------- | -------- | ---- | ---- |
+
+## 四、事实源映射
+
+| 事实类型 | 期望事实源 | 当前事实源 | 是否冲突 |
+| -------- | ---------- | ---------- | -------- |
+| REQ | Spec | | |
+| API | API Contract | | |
+| PLAN | Implementation Plan | | |
+| RISK / EDGE | Implementation Plan | | |
+| TEST | Implementation Plan | | |
+| CHG | Change Report | | |
+| VERIFY | Verification Report | | |
+| KI | Verification Report | | |
+
+## 五、断链检查
+
+| 链路 | 状态 | 问题 |
+| ---- | ---- | ---- |
+| REQ -> PLAN | | |
+| REQ -> TEST | | |
+| RISK -> TEST | | |
+| PLAN -> CHG | | |
+| CHG -> Verification | | |
+| TEST -> Result | | |
+| KI -> Owner / Status | | |
+
+## 六、Verification 有效性检查
+
+- 是否绑定 Base Commit：
+- 是否绑定 Head Commit：
+- 是否记录 Change Range：
+- 是否覆盖所有 CHG：
+- 是否存在未接受 P0 / P1：
+- 是否可能过期：
+
+## 七、需人工决策
+
+仅记录无法从当前材料直接判断，且会影响必需文档、治理成本或交付判断的决策点。
+
+| 决策点 | 不确定原因 | 需要确认的信息 | 对交付判断的影响 |
+| ------ | ---------- | -------------- | ---------------- |
+
+## 八、关键问题列表
+
+按严重程度排序。每条包含：
+
+- 问题：
+- 类型：
+- 影响：
+- 建议：
+
+## 九、治理调整方案
+
+输出建议后的目标结构。
+
+Light Mode 示例：
+
+```text
+docs/
+  spec.md
+  plan.md
+  change.md
+  verification.md
+```
+
+Standard Mode 示例：
+
+```text
+docs/
+  spec/
+  api/
+  plan/
+  changes/
+  verification/
+```
+
+## 十、交付状态判断
+
+只能选择一个：
+
+- 文档体系足以支撑 Pre-Code 生码
+- 文档体系不足以支撑 Pre-Code 生码
+- 文档体系足以支撑 Post-Code review / 验证
+- 文档体系不足以支撑 Post-Code review / 验证
+- 文档体系足以进入人工最终决策
+- 文档体系不可交付
+
+并给出简短原因。
