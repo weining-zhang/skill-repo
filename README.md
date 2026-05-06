@@ -43,8 +43,33 @@ skills/documentation-governance/
 ├── agents/
 │   └── openai.yaml
 └── references/
+    ├── design-principles.md
     ├── full-report-template.md
     └── governance-rules.md
+```
+
+### change-report
+
+用于在 Post-Code 阶段根据 git diff、commit range、PR 改动或已完成代码变更生成 / 更新 Change Report，并在必要时生成 Commit Record。
+
+适用场景：
+
+- 生成或更新 Change Report
+- 记录 Base Commit、Head Commit、Change Range
+- 汇总实际改动 CHG
+- 映射关联 REQ / PLAN
+- 标出与 Plan 的偏差、新增风险和 Verification 关注点
+- 大 PR、多人并行或审计场景下生成 Commit Record
+
+位置：
+
+```text
+skills/change-report/
+├── SKILL.md
+├── agents/
+│   └── openai.yaml
+└── references/
+    └── templates.md
 ```
 
 ## 目录约定
