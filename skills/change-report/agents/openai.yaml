@@ -1,0 +1,4 @@
+interface:
+  display_name: "Change Report"
+  short_description: "帮助生成和维护代码改动事实记录、变更说明和提交追踪"
+  default_prompt: "使用 $change-report 根据当前 git diff 或指定 Base..Head 生成 Change Report，记录版本范围、实际改动、关联 REQ / PLAN、偏差、新增风险和 Verification 关注点。"
