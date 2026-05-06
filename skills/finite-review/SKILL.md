@@ -1,6 +1,6 @@
 ---
 name: finite-review
-description: Use when reviewing code diffs, technical documents, product specs, requirement specs, design docs, API docs, release changes, bug-fix follow-ups, or AI-generated changes with bounded review rounds. Focuses on high-confidence delivery risks, spec clarity, severity classification, regression review, and clear stop conditions. 适用于有限轮次代码审查、文档审查、规格/需求审查、复审和上线前风险审查。
+description: Use when reviewing code diffs, technical documents, product specs, requirement specs, design docs, API docs, release changes, bug-fix follow-ups, AI-generated changes, or cross-review outputs from multiple IDEs/models with bounded review rounds. Focuses on high-confidence delivery risks, spec clarity, severity classification, regression review, finding consolidation, review decision records, and clear stop conditions. 适用于有限轮次代码审查、文档审查、规格/需求审查、复审、多模型 / 多 IDE 交叉 review 和上线前风险审查。
 ---
 # 有限轮次代码 / 文档审查
 
@@ -21,6 +21,7 @@ description: Use when reviewing code diffs, technical documents, product specs, 
 - 上线前变更审查
 - Bug fix 方案复审
 - 已完成修改后的回归审查
+- 多模型 / 多 IDE 交叉 review 结果归并与复审
 
 不适用于：
 
@@ -49,6 +50,7 @@ description: Use when reviewing code diffs, technical documents, product specs, 
 - 没有历史审查结果或修复说明时，默认第一轮审查。
 - 出现“已修复”“复审”“回归看一下”“再 review 一下”且提供上一轮问题或修改内容时，按第二轮或后续复审处理。
 - 只要求验证指定修复项时，仅检查指定修复项和本轮修改直接引入的 P0 / P1。
+- 出现“交叉 review”“多模型 review”“A/B review”“归并 review 结果”，或提供多个 IDE / 模型的审查输出时，按交叉 Review Light 模式处理。
 
 ## 审查流程
 
@@ -78,6 +80,109 @@ description: Use when reviewing code diffs, technical documents, product specs, 
 - 是否满足停止条件
 
 第三轮及以后不得提出新的 P2 / P3，除非它们由本轮修改直接引入且影响明确。
+
+## 交叉 Review Light 模式
+
+交叉 Review 用于将多个 IDE / 模型的独立审查结果收敛成统一问题列表和决策记录。默认使用 Light 目录，不引入复杂治理结构。
+
+推荐目录：
+
+```text
+docs/review/
+  review-record.md
+  runs/
+    <reviewer-id>-round-<n>.md
+```
+
+职责：
+
+- `runs/` 保存每个 IDE / 模型的原始 review 输出，必须尽量原样保存，不改写、不合并、不裁剪。
+- `review-record.md` 记录统一 Review Packet、问题归并、人工决策、复审验证和停止条件。
+- `review-record.md` 不是 REQ / PLAN / CHG / TEST / KI 的事实源，不得重新定义需求、方案、改动、测试或 Known Issues。
+
+### reviewer-id 规则
+
+不得使用 `a-ide`、`b-ide`、`model-a`、`model-b` 这类无法追溯的占位名。
+
+`reviewer-id` 必须能说明审查来源，优先包含工具 / IDE 名和模型名：
+
+```text
+<tool-or-ide>-<model>-round-<n>.md
+```
+
+示例：
+
+```text
+codex-gpt-5.1-round-1.md
+qoder-claude-sonnet-4.5-round-1.md
+cursor-gpt-5.1-round-2.md
+```
+
+如果用户没有说明 IDE / 工具名或模型名，必须先澄清：
+
+```text
+请确认这份 review 输出的来源：IDE / 工具名和模型名分别是什么？
+例如：Codex + GPT-5.1、Qoder + Claude Sonnet 4.5、Cursor + GPT-5.1。
+```
+
+如果用户确认无法得知模型名，可以使用 `<tool-or-ide>-model-unknown-round-<n>.md`，并在 `review-record.md` 的“需人工确认”中记录模型名未知。
+
+### 交叉 Review 流程
+
+1. 准备同一份 Review Packet：审查对象、commit range 或文件版本、审查目标、上下文、不审查范围。
+2. 各 IDE / 模型独立审查。A 的结果不得影响 B，B 的结果也不得影响 A。
+3. 将各原始输出保存到 `docs/review/runs/`。
+4. 在 `review-record.md` 中归并 Findings，给每个问题分配统一 Finding ID。
+5. 按证据裁决，不按模型投票。
+6. 修复后只做定向复审：验证已接受问题是否修复、修复是否引入新的 P0 / P1、是否满足停止条件。
+7. 满足停止条件后，建议停止 AI review。
+
+### 归并与裁决规则
+
+- 多个模型发现同一问题时，合并为一个 Finding，来源标记为多个 reviewer-id。
+- 单个模型发现的问题，只要证据充分，也可以接受。
+- 多个模型结论冲突时，回到证据位置、影响和可验证性判断。
+- 低置信度猜测、主观偏好、无证据建议，应拒绝或放入“需人工确认”，不得作为阻塞问题。
+- 被拒绝的问题必须记录拒绝原因。
+- 被接受但未修复的风险，如果影响交付，应转入 Verification Report / Known Issues，而不是只留在 Review Record。
+
+### Review Record 最小结构
+
+```text
+# Review Record
+
+## Review Packet
+
+- 审查对象：
+- 版本 / Change Range：
+- 审查目标：
+- 不审查范围：
+
+## Review Runs
+
+| reviewer-id | IDE / 工具 | 模型 | 轮次 | 原始输出 |
+| ----------- | ---------- | ---- | ---- | -------- |
+
+## Findings Registry
+
+| Finding ID | 来源 | 优先级 | 问题 | 证据位置 | 决策 | 状态 |
+| ---------- | ---- | ------ | ---- | -------- | ---- | ---- |
+
+## Decisions
+
+| Finding ID | 决策 | 理由 | Owner | 后续处理 |
+| ---------- | ---- | ---- | ----- | -------- |
+
+## Fix Verification
+
+| Finding ID | 验证结果 | 说明 |
+| ---------- | -------- | ---- |
+
+## Stop Decision
+
+- 是否满足停止条件：
+- 最终建议：
+```
 
 ## 审查纪律
 
