@@ -1,0 +1,4 @@
+interface:
+  display_name: "Context Ledger"
+  short_description: "为长链路设计、调试和改造讨论维护上下文账本与决策记录"
+  default_prompt: "使用 $context-ledger 为一个长链路设计、调试或改造问题维护 problem、decision log、solution draft 和 checkpoint。"

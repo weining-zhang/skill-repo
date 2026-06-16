@@ -72,6 +72,28 @@ skills/change-report/
     └── templates.md
 ```
 
+### context-ledger
+
+用于长链路问题、架构设计、复杂调试、重构 / 迁移方案、跨多轮讨论的 AI 协作上下文管理。
+
+适用场景：
+
+- 担心多轮讨论或 context 压缩丢失关键信息
+- 需要维护 problem map、decision log、solution draft、checkpoint
+- 需要区分代码事实、运行事实、用户确认、讨论假设和待确认问题
+- 长链路改造、复杂调试、架构方案、迁移方案的滚动收敛
+
+位置：
+
+```text
+skills/context-ledger/
+├── SKILL.md
+├── agents/
+│   └── openai.yaml
+└── references/
+    └── ledger-templates.md
+```
+
 ## 目录约定
 
 每个 skill 至少包含一个 `SKILL.md`：
