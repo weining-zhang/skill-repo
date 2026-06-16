@@ -1,104 +1,48 @@
 # skill-repo
 
-个人 Codex Skill 包集合。
+个人 Codex Skill 包集合，用来把反复出现的 AI 协作流程沉淀成可复用的工作协议。
 
-## Skills
+## 怎么选
 
-### finite-review
+| 问题类型 | Skill | 解决什么问题 | 适用场景 | 入口 |
+| -------- | ----- | ------------ | -------- | ---- |
+| 长链路上下文 | `context-ledger` | 长链路讨论容易丢上下文、混淆事实 / 假设 / 决策 | 架构设计、复杂调试、重构 / 迁移方案、多轮讨论和 context 压缩 | `skills/context-ledger/` |
+| 改动事实记录 | `change-report` | 已完成改动缺少可追踪事实记录 | 根据 git diff、commit range、PR 改动生成 / 更新 Change Report，记录 CHG、REQ / PLAN 关联、偏差和风险 | `skills/change-report/` |
+| 有限轮次审查 | `finite-review` | AI review 容易发散、重复或纠缠低价值建议 | 代码审查、文档审查、规格复审、Bug fix 复审、上线前风险审查、多模型 review 归并 | `skills/finite-review/` |
+| 文档体系治理 | `documentation-governance` | 文档体系是否完整、事实源是否清晰、是否支撑交付难以判断 | 文档目录盘点、Pre-Code / Post-Code 就绪度、事实源冲突、断链、Known Issues 和交付状态检查 | `skills/documentation-governance/` |
 
-用于有限轮次代码 / 文档审查，重点识别高置信度、可验证、会影响交付质量的问题，并判断是否可以进入人工最终决策、合并或发布流程。
+## 使用方式
 
-适用场景：
+这些 skill 不是一条固定流水线，设计初衷是各自独立解决一类协作问题。按当前问题单独选用即可，需要时再组合。
 
-- PR / MR 代码审查
-- AI 生成代码审查
-- 产品规格、技术规格、设计文档审查
-- Bug fix 方案复审
-- 上线前变更审查
+可选组合示例：
 
-位置：
-
-```text
-skills/finite-review/SKILL.md
-```
-
-### documentation-governance
-
-用于评估项目文档体系是否完整、结构是否合理、事实源是否清晰、阶段是否匹配，以及是否足以支撑 AI Coding、人工协作、review、验证和交付决策。
-
-适用场景：
-
-- 文档治理和文档目录盘点
-- Pre-Code / Post-Code 就绪度检查
-- Light Mode / Standard Mode 结构判断
-- 事实源冲突和断链检查
-- Change Report、Verification Report、Known Issues 治理
-- 交付就绪度判断
-
-位置：
-
-```text
-skills/documentation-governance/
-├── SKILL.md
-├── agents/
-│   └── openai.yaml
-└── references/
-    ├── design-principles.md
-    ├── full-report-template.md
-    └── governance-rules.md
-```
-
-### change-report
-
-用于在 Post-Code 阶段根据 git diff、commit range、PR 改动或已完成代码变更生成 / 更新 Change Report，并在必要时生成 Commit Record。
-
-适用场景：
-
-- 生成或更新 Change Report
-- 记录 Base Commit、Head Commit、Change Range
-- 汇总实际改动 CHG
-- 映射关联 REQ / PLAN
-- 标出与 Plan 的偏差、新增风险和 Verification 关注点
-- 大 PR、多人并行或审计场景下生成 Commit Record
-
-位置：
-
-```text
-skills/change-report/
-├── SKILL.md
-├── agents/
-│   └── openai.yaml
-└── references/
-    └── templates.md
-```
-
-### context-ledger
-
-用于长链路问题、架构设计、复杂调试、重构 / 迁移方案、跨多轮讨论的 AI 协作上下文管理。
-
-适用场景：
-
-- 担心多轮讨论或 context 压缩丢失关键信息
-- 需要维护 problem map、decision log、solution draft、checkpoint
-- 需要区分代码事实、运行事实、用户确认、讨论假设和待确认问题
-- 长链路改造、复杂调试、架构方案、迁移方案的滚动收敛
-
-位置：
-
-```text
-skills/context-ledger/
-├── SKILL.md
-├── agents/
-│   └── openai.yaml
-└── references/
-    └── ledger-templates.md
-```
+- 长链路方案讨论：只用 `context-ledger`。
+- 已完成代码改动记录：只用 `change-report`。
+- 单次代码 / 文档审查：只用 `finite-review`。
+- 文档体系盘点：只用 `documentation-governance`。
+- 大型改造交付：可以按需组合多个 skill，但不要默认套用完整链路。
 
 ## 目录约定
 
-每个 skill 至少包含一个 `SKILL.md`：
+每个 skill 至少包含：
 
-- `name` 和 `description` 用于触发 skill。
-- 正文放核心流程和必须执行的规则。
-- `references/` 用于按需加载详细规则、模板或参考材料。
-- `agents/openai.yaml` 是可选 UI 元数据，用于展示名称、短描述和默认提示词；删除后不影响 skill 的核心可用性。
+```text
+skills/<skill-name>/
+  SKILL.md
+```
+
+可选目录：
+
+```text
+skills/<skill-name>/
+  agents/openai.yaml
+  references/
+  scripts/
+  assets/
+```
+
+- `SKILL.md`：核心触发描述和执行规则。
+- `references/`：按需读取的模板、规则或参考材料。
+- `agents/openai.yaml`：Codex UI 元数据。
+- `scripts/` / `assets/`：确定性脚本或可复用素材。
