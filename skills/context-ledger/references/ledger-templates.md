@@ -192,6 +192,8 @@ Last updated: YYYY-MM-DD
 
 ## checkpoint.md
 
+checkpoint 是当前状态快照，不是聊天流水。优先记录当前已定、当前未决、当前废弃和下一步；避免记录过细的过程细节。
+
 ````md
 # Checkpoints
 
