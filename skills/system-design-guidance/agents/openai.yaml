@@ -1,0 +1,4 @@
+interface:
+  display_name: "System Design Guidance"
+  short_description: "为方案设计、方案评审和代码评审提供通用系统设计指导与风险分析"
+  default_prompt: "使用 $system-design-guidance 指导或评审当前系统设计，从六个风险面追踪关键流程、设计决策、不变量和实现证据。"
