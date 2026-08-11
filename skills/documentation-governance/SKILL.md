@@ -1,6 +1,6 @@
 ---
 name: documentation-governance
-description: 用于评估项目文档体系是否完整、结构是否合理、事实源是否清晰、阶段是否匹配，以及是否足以支撑 AI Coding、人工协作、review、验证和交付决策。适用于文档治理、文档目录盘点、Pre-Code/Post-Code 就绪度、文档架构、事实源冲突、追踪链断裂、Change Report、Verification Report、Known Issues 治理和交付就绪度检查。不用于文案润色、内容级文档 review、代码 review，或判断技术方案是否优雅 / 正确。
+description: 用于评估项目文档体系是否完整、结构是否合理、事实源是否清晰、阶段是否匹配，以及是否足以支撑 AI Coding、人工协作、review、验证和交付决策。适用于文档治理、文档目录盘点、Pre-Code/Post-Code 就绪度、文档架构、事实源冲突、长期事实生命周期治理、过期信息扩散、追踪链断裂、Change Report、Verification Report、Known Issues 治理和交付就绪度检查。不用于文案润色、内容级文档 review、代码 review，或判断技术方案是否优雅 / 正确。
 ---
 
 # 文档治理 / Documentation Governance
@@ -14,15 +14,16 @@ description: 用于评估项目文档体系是否完整、结构是否合理、�
 - 覆盖当前阶段必需的事实
 - 采用合适的 Light Mode 或 Standard Mode
 - 每类事实有清晰且唯一的事实源
+- 当前有效事实和历史事实有清晰边界
 - 派生文档没有重新定义事实
 - 能支撑 AI Coding、人工协作、review、验证和交付决策
-- 能避免多文档演进造成事实漂移、冲突或无限 review
+- 能避免多文档演进造成事实漂移、过期信息扩散、冲突或无限 review
 
 ## 资源读取
 
 默认只使用本文件做快速诊断。
 
-当需要精确检查必须文档、事实源映射、可选文档、断链、Verification 有效性或交付阻塞规则时，读取 [governance-rules.md](references/governance-rules.md)。
+当需要精确检查必须文档、事实源映射、事实生命周期、可选文档、断链、Verification 有效性或交付阻塞规则时，读取 [governance-rules.md](references/governance-rules.md)。
 
 只有当用户明确要求“完整治理报告”“完整报告”“表格化报告”或“目标目录结构”时，读取 [full-report-template.md](references/full-report-template.md)。
 
@@ -37,6 +38,7 @@ description: 用于评估项目文档体系是否完整、结构是否合理、�
 - 检查必须文档和必须事实区块是否存在
 - 检查目录结构和 `index.md` 职责是否清晰
 - 检查每类事实是否只有一个事实源
+- 检查长期事实是否仍然有效，是否被历史文档或派生文档错误扩散
 - 检查派生文档是否定义了新事实
 - 检查关键追踪链路是否断裂
 - 检查 Verification 和 Known Issues 是否足以支撑交付判断
@@ -121,13 +123,46 @@ Mixed：生码前和生码后文档同时存在，或实现已经开始但生码
 
 `index.md`、summary、release note、review record 都是派生文档。它们可以聚合和引用事实，但不得定义新的 REQ、API、PLAN、RISK、TEST、CHG、VERIFY 或 KI。
 
+### 文档事实生命周期
+
+长期事实必须区分当前有效、历史记录、已被替代和需要重新确认。
+
+重点治理这些容易过期并干扰后续开发的事实：
+
+- 模块上下游
+- 模块职责与边界
+- 改造范围与不做范围
+- 依赖关系、兼容性假设和接口行为
+- 边界条件、风险假设和测试前提
+- 迁移约束、降级策略和回滚前提
+
+建议状态：
+
+| 状态 | 含义 |
+| ---- | ---- |
+| Active | 当前有效，可作为后续开发事实依据 |
+| Superseded | 已被后续事实源替代，只能作为历史记录 |
+| Deprecated | 已不建议使用或引用，等待清理或迁移 |
+| Needs Revalidation | 可能过期，需要负责人或代码 / 变更证据重新确认 |
+
+历史 Plan、旧 summary、旧 README 或旧设计说明可以保留，但如果已经不代表当前模块事实，必须标记为历史或 Superseded，不得继续被 `index.md`、新 Plan、AI Prompt 或派生文档当作当前事实源引用。
+
+长期事实建议至少能追踪：
+
+- 当前状态
+- 适用范围
+- 适用版本 / commit range / 生效时间
+- Owner 或确认人
+- 替代来源或替代文档
+- 重新确认条件
+
 ### 目录容器
 
 把目录视为文档容器，把具体文件视为文档节点。
 
 目录可以聚合、导航、展示当前状态、指向当前版本。事实必须落在具体文件或明确区块中，不接受“整个目录”作为模糊事实源。
 
-Standard Mode 下，每个文档目录都建议有 `index.md`。`index.md` 只能做导航、聚合和当前状态说明。
+Standard Mode 下，每个文档目录都建议有 `index.md`。`index.md` 只能做导航、聚合和当前状态说明，并应指向当前有效事实源；如果目录中存在已过期或被替代文档，`index.md` 可以列出其历史状态和替代来源，但不得重新定义事实。
 
 ## 必须锚点
 
@@ -162,6 +197,7 @@ Known Issues 必须包含 ID、等级、来源、描述、状态、Owner、处�
 | 是否启用 Commit Record | 大 PR、多人并行、审计要求、AI 高频自动提交、需要 commit 级追踪 | 是否需要审计级追踪属于治理成本取舍 |
 | 是否从 Light Mode 升级 Standard Mode | 文档已自然拆分为多目录、多角色、多 PR / 子任务并行 | 当前 Light Mode 可工作，但未来是否长期维护或多人协作需要负责人判断 |
 | Verification 是否过期 | Head Commit、Change Range、CHG 或 TEST 明确变化且报告未更新 | 无法获知当前代码 Head；只能提示“可能过期”，由人工确认当前被验证版本 |
+| 长期事实是否过期 | 后续 Change Report、Verification、代码结构、接口契约或 index 指向显示旧事实不再匹配 | 无法确认旧上下游、边界、范围是否仍适用；标记 Needs Revalidation 并要求负责人确认 |
 | P2 / P3 如何处理 | Known Issues 已有状态、Owner、接受理由或 backlog | P2 是否本次修复、接受或延期，需要负责人取舍 |
 | 现有文档结构冲突如何处理 | 能明确定位冲突事实、来源文件和目标事实源 | 需要搬迁原文档内容、重命名文件、调整目录或改变维护方式时，必须先给计划并等待人工确认 |
 | 输出快速诊断还是完整报告 | 用户明确要求完整报告时输出完整报告，否则快速诊断 | 不需要额外人工决策，按用户请求执行 |
@@ -205,11 +241,12 @@ Known Issues 必须包含 ID、等级、来源、描述、状态、Owner、处�
 5. 按当前模式检查目录结构。
 6. 按当前阶段检查必须文档和必须区块。
 7. 检查事实源冲突，以及派生文档是否定义新事实。
-8. 检查断链：REQ 到 PLAN、REQ 到 TEST、API 到 PLAN、RISK 到 TEST、PLAN 到 CHG、CHG 到 Verification、TEST 到结果、失败 / 跳过 TEST 到 Known Issues 或原因、review issue 到决策、Known Issue 到 Owner / 状态。
-9. 当存在 Post-Code 产物时，检查 Verification 有效性。
-10. 如果需要解决现有文档结构冲突，只输出内容搬迁计划，不直接执行搬迁。
-11. 识别是否有需要人工决策的治理判断点。
-12. 从固定状态列表中选择一个交付状态。
+8. 检查长期事实生命周期：当前有效事实是否明确，历史事实是否被标记，旧上下游 / 边界 / 范围是否仍被错误引用。
+9. 检查断链：REQ 到 PLAN、REQ 到 TEST、API 到 PLAN、RISK 到 TEST、PLAN 到 CHG、CHG 到 Verification、TEST 到结果、失败 / 跳过 TEST 到 Known Issues 或原因、review issue 到决策、Known Issue 到 Owner / 状态。
+10. 当存在 Post-Code 产物时，检查 Verification 有效性。
+11. 如果需要解决现有文档结构冲突，只输出内容搬迁计划，不直接执行搬迁。
+12. 识别是否有需要人工决策的治理判断点。
+13. 从固定状态列表中选择一个交付状态。
 
 ## Verification 有效性
 
@@ -257,10 +294,11 @@ Post-Code 阶段必须采用 commit 绑定验证：
 
 1. 缺少必须文档或必须区块
 2. 事实源冲突
-3. 阶段错位
-4. 断链
-5. 派生文档定义新事实
-6. 目录结构不清晰
+3. 过期事实被当作当前事实引用
+4. 阶段错位
+5. 断链
+6. 派生文档定义新事实
+7. 目录结构不清晰
 
 ### 四、需人工决策
 
@@ -279,6 +317,7 @@ Post-Code 阶段必须采用 commit 绑定验证：
 
 - 补齐缺失事实源
 - 将某类事实收敛到指定文件
+- 将旧上下游 / 边界 / 范围事实标记为 Superseded，并指向当前有效事实源
 - 将 `index.md` 改为聚合入口
 - 为 Verification 增加 Known Issues 区块
 - 为 Change Report 补充 Base / Head / Change Range
@@ -309,6 +348,7 @@ Post-Code 阶段必须采用 commit 绑定验证：
 当前文档体系不足以支撑生码后 review / 验证 / 交付。
 当前文档体系不足以证明实现正确性。
 当前文档体系不足以支撑交付。
+存在过期事实仍被当作当前事实引用，可能干扰后续开发。
 文档体系可支撑当前阶段，但建议按治理建议收敛结构。
 文档体系足以支撑当前阶段。
 ```
@@ -326,6 +366,8 @@ Post-Code 阶段必须采用 commit 绑定验证：
 - 在搬迁内容时改写、润色、总结、重述或改变原文含义
 - 把可选文档说成必须文档
 - 把 Light Mode 强行升级为 Standard Mode
+- 把历史 Plan、旧 README、旧 summary 或旧设计说明继续当作当前有效事实源
+- 无证据地把旧事实标记为 Active
 - 在不知道是否涉及接口时强行要求 `api/`
 - 要求未合并前必须知道 merged commit
 - 要求每个 commit 都必须有 Commit Record
